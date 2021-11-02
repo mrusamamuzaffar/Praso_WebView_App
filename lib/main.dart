@@ -4,15 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:praso/home_screen.dart';
 import 'package:praso/web_view_redirect.dart';
+import 'package:provider/provider.dart';
 
 ConnectivityResult? connectivityResult;
 ConnectionState? connectionState;
 double screenWidth = 0.0;
 void main() {
-  runApp( const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: MyApp(),
-    title: 'Praso App',
+  runApp( MultiProvider(
+    providers: [
+      ChangeNotifierProvider<PrasoNotifyProvider>(create: (context) => PrasoNotifyProvider(),)
+    ],
+    child: const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MyApp(),
+      title: 'Praso App',
+    ),
   ));
 }
  class MyApp extends StatefulWidget {
@@ -32,7 +38,7 @@ void main() {
      ));
      screenWidth = MediaQuery.of(context).size.width;
 
-     Future.delayed(const Duration(seconds: 1), () async{
+     Future.delayed(const Duration(seconds: 1), () async {
        connectivityResult = await Connectivity().checkConnectivity();
          switch (connectivityResult!) {
            case ConnectivityResult.mobile:

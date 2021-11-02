@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -18,6 +19,8 @@ class _WebViewPageState extends State<WebViewPage> {
   WebViewController? _webViewController;
   String? currentWebUrl;
   bool whatsAppVisibility = true;
+  Timer? timer;
+  PrasoNotifyProvider? prasoNotifyProvider;
 
   final Completer<WebViewController> _controllerCompleter = Completer<WebViewController>();
 
@@ -49,12 +52,6 @@ class _WebViewPageState extends State<WebViewPage> {
     }
   }
 
-  @override
-  void initState() {
-    WebView.platform = SurfaceAndroidWebView();
-    super.initState();
-  }
-
   Widget bottomNavigationBarItems({required String imagePath, required String iconText}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -72,9 +69,28 @@ class _WebViewPageState extends State<WebViewPage> {
     );
   }
 
+  @override
+  void initState() {
+    prasoNotifyProvider = Provider.of(context,listen: false);
+    WebView.platform = SurfaceAndroidWebView();
+    timer = Timer.periodic(const Duration(seconds: 2), (timer) async{
+      currentWebUrl = await _webViewController!.currentUrl();
+      print('url.........$currentWebUrl');
+      prasoNotifyProvider!.url = currentWebUrl!;
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    print('build invoked');
     return SafeArea(
       child: WillPopScope(
         onWillPop: () async {
@@ -116,9 +132,7 @@ class _WebViewPageState extends State<WebViewPage> {
                   onWebViewCreated: (WebViewController webViewController) {
                     _controllerCompleter.future.then((value) => _webViewController = value);
                     _controllerCompleter.complete(webViewController);
-                    print('web view created invoked');
                     webViewController.currentUrl().then((value) => currentWebUrl = value!);
-                    print('...........$currentWebUrl');
                   },
                 ),
                 Positioned(
@@ -139,27 +153,33 @@ class _WebViewPageState extends State<WebViewPage> {
                                 _webViewController!.goBack();
                               }
                             },
-                              child: bottomNavigationBarItems(imagePath: 'assets/images/home_icon.jpg', iconText: 'Home Page')),
+                              child: bottomNavigationBarItems(imagePath: 'assets/images/home_icon.jpg', iconText: 'inicio')),
 
                           GestureDetector(
                             onTap: () {
 
                             },
-                              child: bottomNavigationBarItems(imagePath: 'assets/images/categories_icon.png', iconText: 'Categories')),
+                              child: bottomNavigationBarItems(imagePath: 'assets/images/categories_icon.png', iconText: 'categorias')),
 
                           GestureDetector(
                             onTap: () {
                               _webViewController!.loadUrl('https://praso.com.br/account/login?return_url=%2Faccount');
                             },
-                              child: bottomNavigationBarItems(imagePath: 'assets/images/contact_Icon.png', iconText: 'account')),
+                              child: bottomNavigationBarItems(imagePath: 'assets/images/contact_Icon.png', iconText: 'conta')),
 
-                          Visibility(
-                            visible: currentWebUrl != null ? currentWebUrl!.contains('praso') : true,
-                            child: GestureDetector(
-                              onTap: ()  {
-                                openWhatsApp();
-                              },
-                                child: bottomNavigationBarItems(imagePath: 'assets/images/whats_app_icon.png', iconText: 'Whats app')),
+                          Selector<PrasoNotifyProvider, String>(
+                            selector: (context, prasoNotifyProvider) => prasoNotifyProvider.url,
+                            builder: (context, value, child) {
+                              print('builderrrrrr');
+                              return Visibility(
+                              visible: currentWebUrl != null ? currentWebUrl!.contains('praso.com.br') : true,
+                              child: GestureDetector(
+                                onTap: ()  {
+                                  openWhatsApp();
+                                },
+                                  child: bottomNavigationBarItems(imagePath: 'assets/images/whats_app_icon.png', iconText: 'Whats app')),
+                            );
+                            },
                           ),
                         ],
                       )
@@ -170,6 +190,17 @@ class _WebViewPageState extends State<WebViewPage> {
         ),
       ),
     );
+  }
+}
+
+class PrasoNotifyProvider with ChangeNotifier {
+  String _url = '';
+
+  String get url => _url;
+
+  set url(String value) {
+    _url = value;
+    notifyListeners();
   }
 }
 
