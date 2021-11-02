@@ -65,6 +65,11 @@ flutter:
   assets:
     - assets/images/parso_icon.jpg
     - assets/images/no_internet_connection.png
+    - assets/images/praso_splash_icon.png
+    - assets/images/whats_app_icon.png
+    - assets/images/home_icon.jpg
+    - assets/images/categories_icon.png
+    - assets/images/contact_Icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

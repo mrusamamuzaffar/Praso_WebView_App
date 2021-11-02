@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:praso/home_screen.dart';
 import 'package:praso/web_view_redirect.dart';
+
 ConnectivityResult? connectivityResult;
 ConnectionState? connectionState;
+double screenWidth = 0.0;
 void main() {
   runApp( const MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -23,19 +26,24 @@ void main() {
 
    @override
    Widget build(BuildContext context) {
+
+     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+         statusBarColor: Color(0xFF487CEA),
+     ));
+     screenWidth = MediaQuery.of(context).size.width;
+
      Future.delayed(const Duration(seconds: 1), () async{
        connectivityResult = await Connectivity().checkConnectivity();
          switch (connectivityResult!) {
            case ConnectivityResult.mobile:
            case ConnectivityResult.wifi:
              {
-               Navigator.pop(context);
-               Navigator.push(context, MaterialPageRoute(builder: (context) => const WebViewPage(),));
+
+               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const WebViewPage(),));
                break;
              }
            case ConnectivityResult.none:
              {
-               Navigator.pop(context);
                Navigator.push(context, MaterialPageRoute(builder: (context) => const ErrorScreen(),));
                break;
              }
@@ -44,14 +52,15 @@ void main() {
        }
      });
      return Scaffold(
+       backgroundColor: const Color(0xFF487CEA),
        body: Center(
          child: Container(
-           height: 160,
-           width: 160,
+           height: 200,
+           width: screenWidth * 0.80,
            decoration: BoxDecoration(
              borderRadius: BorderRadius.circular(25),
              image: const DecorationImage(
-               image: AssetImage('assets/images/parso_icon.jpg'),
+               image: AssetImage('assets/images/praso_splash_icon.png'),
              )
            ),
          ),
