@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "47271602316",
+    "project_id": "praso-push-notification",
+    "storage_bucket": "praso-push-notification.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47271602316:android:541d19b31a1c27160ab3a9",
+        "android_client_info": {
+          "package_name": "br.com.praso.app.praso"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "47271602316-42iushp5nvs4pinhju3igbtuifb75bc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH6m49wyxrOH_NLh1B2DXne95VmHnet_k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "47271602316-42iushp5nvs4pinhju3igbtuifb75bc5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
