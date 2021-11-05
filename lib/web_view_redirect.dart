@@ -17,7 +17,6 @@ class WebViewPage extends StatefulWidget {
 
 class _WebViewPageState extends State<WebViewPage> {
   WebViewController? _webViewController;
-  String? currentWebUrl;
   bool whatsAppVisibility = true;
   Timer? timer;
   PrasoNotifyProvider? prasoNotifyProvider;
@@ -52,10 +51,9 @@ class _WebViewPageState extends State<WebViewPage> {
     }
   }
 
-  Widget bottomNavigationBarItems({required String imagePath, required String iconText}) {
+  Widget bottomNavigationBarItems({required String imagePath, required String iconText, required Color color}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
       children: [
          Image(
           height: 30,
@@ -63,7 +61,7 @@ class _WebViewPageState extends State<WebViewPage> {
             image: AssetImage(imagePath)),
          Padding(
           padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
-          child: Text(iconText, style: const TextStyle(color: Color(0xFF737373)),),
+          child: Text(iconText, style: TextStyle(color: color),),
         ),
       ],
     );
@@ -73,17 +71,11 @@ class _WebViewPageState extends State<WebViewPage> {
   void initState() {
     prasoNotifyProvider = Provider.of(context,listen: false);
     WebView.platform = SurfaceAndroidWebView();
-    timer = Timer.periodic(const Duration(seconds: 2), (timer) async{
-      currentWebUrl = await _webViewController!.currentUrl();
-      print('url.........$currentWebUrl');
-      prasoNotifyProvider!.url = currentWebUrl!;
-    });
     super.initState();
   }
 
   @override
   void dispose() {
-    timer!.cancel();
     super.dispose();
   }
 
@@ -125,6 +117,7 @@ class _WebViewPageState extends State<WebViewPage> {
         child: Scaffold(
           body: Stack(
               children: [
+                //webView
                 WebView(
                   initialUrl: 'https://praso.com.br/',
                   javascriptMode: JavascriptMode.unrestricted,
@@ -132,9 +125,29 @@ class _WebViewPageState extends State<WebViewPage> {
                   onWebViewCreated: (WebViewController webViewController) {
                     _controllerCompleter.future.then((value) => _webViewController = value);
                     _controllerCompleter.complete(webViewController);
-                    webViewController.currentUrl().then((value) => currentWebUrl = value!);
                   },
+                  onPageStarted: (url) {
+                    prasoNotifyProvider!.url = url;
+                  },
+                  /*navigationDelegate: (navigation) async {
+                    print('......naviation url......${navigation.url}');
+                    if(!(navigation.url.contains(prasoNotifyProvider!.url))) {
+                      print('downloading start.........!!');
+                      final taskId = await FlutterDownloader.enqueue(
+                        url: navigation.url,
+                        savedDir: '/storage/emulated/0/praso/',
+                        showNotification: true, // show download progress in status bar (for Android)
+                        openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+                      );
+                      print('.....task Id......$taskId');
+                    }
+                    return Future.value(NavigationDecision.navigate);
+
+                  },*/
+                  gestureNavigationEnabled: true,
                 ),
+
+                //bottom navigation bar
                 Positioned(
                   right: 0,
                   bottom: 0,
@@ -144,44 +157,59 @@ class _WebViewPageState extends State<WebViewPage> {
                     child: Container(
                       height: 90,
                       color: Colors.white,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            onTap: () async{
-                              while(await _webViewController!.canGoBack()) {
-                                _webViewController!.goBack();
-                              }
-                            },
-                              child: bottomNavigationBarItems(imagePath: 'assets/images/home_icon.jpg', iconText: 'inicio')),
+                      child: Selector<PrasoNotifyProvider, String>(
+                        selector: (context, prasoNotifyProvider) => prasoNotifyProvider.url,
+                        builder: (context, value, child) =>  Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            //home icon
+                            GestureDetector(
+                              onTap: () async{
+                                while(await _webViewController!.canGoBack()) {
+                                  _webViewController!.goBack();
+                                  prasoNotifyProvider!.homeIcon = Colors.blue;
+                                  prasoNotifyProvider!.categoryIcon = Colors.black;
+                                  prasoNotifyProvider!.accountIcon = Colors.black;
+                                }
+                              },
+                                child: Selector<PrasoNotifyProvider, Color>(
+                                  selector: (context, prasoNotifyProvider) => prasoNotifyProvider.homeIcon,
+                                    builder: (context, value, child) => bottomNavigationBarItems(imagePath: 'assets/images/home_icon.jpg', iconText: 'inicio', color: prasoNotifyProvider!.homeIcon))),
 
-                          GestureDetector(
-                            onTap: () {
+                            //category icon
+                            GestureDetector(
+                              onTap: () {
+                                prasoNotifyProvider!.homeIcon = Colors.black;
+                                prasoNotifyProvider!.categoryIcon = Colors.blue;
+                                prasoNotifyProvider!.accountIcon = Colors.black;
+                                // _webViewController!.loadUrl('https://www.google.com/');
+                              },
+                                child: Selector<PrasoNotifyProvider, Color>(
+                                    selector: (context, prasoNotifyProvider) => prasoNotifyProvider.categoryIcon,
+                                    builder: (context, value, child) => bottomNavigationBarItems(imagePath: 'assets/images/categories_icon.png', iconText: 'categorias', color: prasoNotifyProvider!.categoryIcon))),
 
-                            },
-                              child: bottomNavigationBarItems(imagePath: 'assets/images/categories_icon.png', iconText: 'categorias')),
+                            //account icon
+                            GestureDetector(
+                              onTap: () {
+                                prasoNotifyProvider!.homeIcon = Colors.black;
+                                prasoNotifyProvider!.categoryIcon = Colors.black;
+                                prasoNotifyProvider!.accountIcon = Colors.blue;
+                                _webViewController!.loadUrl('https://praso.com.br/account/login?return_url=%2Faccount');
+                              },
+                                child: Selector<PrasoNotifyProvider, Color>(
+                                    selector: (context, prasoNotifyProvider) => prasoNotifyProvider.accountIcon,
+                                    builder: (context, value, child) => bottomNavigationBarItems(imagePath: 'assets/images/contact_Icon.png', iconText: 'conta', color: prasoNotifyProvider!.accountIcon))),
 
-                          GestureDetector(
-                            onTap: () {
-                              _webViewController!.loadUrl('https://praso.com.br/account/login?return_url=%2Faccount');
-                            },
-                              child: bottomNavigationBarItems(imagePath: 'assets/images/contact_Icon.png', iconText: 'conta')),
-
-                          Selector<PrasoNotifyProvider, String>(
-                            selector: (context, prasoNotifyProvider) => prasoNotifyProvider.url,
-                            builder: (context, value, child) {
-                              print('builderrrrrr');
-                              return Visibility(
-                              visible: currentWebUrl != null ? currentWebUrl!.contains('praso.com.br') : true,
-                              child: GestureDetector(
-                                onTap: ()  {
-                                  openWhatsApp();
-                                },
-                                  child: bottomNavigationBarItems(imagePath: 'assets/images/whats_app_icon.png', iconText: 'Whats app')),
-                            );
-                            },
-                          ),
-                        ],
+                            Visibility(
+                                visible: prasoNotifyProvider!.url.contains('praso.com.br'),
+                                child: GestureDetector(
+                                  onTap: ()  {
+                                    openWhatsApp();
+                                  },
+                                    child: bottomNavigationBarItems(imagePath: 'assets/images/whats_app_icon.png', iconText: 'Whats app', color: Colors.black)),
+                              ),
+                          ],
+                        ),
                       )
                     ),
                   ),)
@@ -195,6 +223,7 @@ class _WebViewPageState extends State<WebViewPage> {
 
 class PrasoNotifyProvider with ChangeNotifier {
   String _url = '';
+  Color _homeIcon = Colors.blue, _categoryIcon = Colors.black, _accountIcon = Colors.black;
 
   String get url => _url;
 
@@ -202,5 +231,25 @@ class PrasoNotifyProvider with ChangeNotifier {
     _url = value;
     notifyListeners();
   }
-}
 
+  get accountIcon => _accountIcon;
+
+  set accountIcon(value) {
+    _accountIcon = value;
+    notifyListeners();
+  }
+
+  get categoryIcon => _categoryIcon;
+
+  set categoryIcon(value) {
+    _categoryIcon = value;
+    notifyListeners();
+  }
+
+  Color get homeIcon => _homeIcon;
+
+  set homeIcon(Color value) {
+    _homeIcon = value;
+    notifyListeners();
+  }
+}

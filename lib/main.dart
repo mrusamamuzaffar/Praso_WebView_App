@@ -19,7 +19,6 @@ double screenWidth = 0.0;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  print('......................................praso firebase initialized');
   FirebaseMessaging.onBackgroundMessage(messageHandler);
 
   runApp( MultiProvider(
