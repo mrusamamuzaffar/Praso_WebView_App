@@ -189,7 +189,7 @@ class _WebViewPageState extends State<WebViewPage> {
                                   builder: (context, value, child) =>
                                       bottomNavigationBarItems(
                                           imagePath:
-                                              'assets/images/home_icon.jpg',
+                                              'assets/images/home_icon.png',
                                           iconText: 'início',
                                           color:
                                               prasoNotifyProvider!.homeIcon))),
@@ -229,7 +229,7 @@ class _WebViewPageState extends State<WebViewPage> {
                                   builder: (context, value, child) =>
                                       bottomNavigationBarItems(
                                           imagePath:
-                                              'assets/images/contact_Icon.png',
+                                              'assets/images/contact_icon.png',
                                           iconText: 'conta',
                                           color: prasoNotifyProvider!
                                               .accountIcon))),
