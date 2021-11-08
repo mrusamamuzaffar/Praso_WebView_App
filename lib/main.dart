@@ -44,7 +44,7 @@ Future<void> main() async {
 
   Future<void> initializeMyFirebaseApp() async {
     await Firebase.initializeApp();
-    print('......................................praso firebase initialized');
+
   }
 
   @override
