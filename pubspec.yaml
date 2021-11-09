@@ -75,7 +75,7 @@ flutter:
     - assets/images/home_select.png
     - assets/images/categories_icon.png
     - assets/images/catagories_select.png
-    - assets/images/contact_icon.png
+    - assets/images/contact.png
     - assets/images/contact_select.png
 
   #   - images/a_dot_ham.jpeg

@@ -77,16 +77,19 @@ class _WebViewPageState extends State<WebViewPage> {
     );
   }
 
-  void downloadFile({required String url}) async{
+  void downloadFile({required String url}) async {
     print('.........started');
 
     final taskId = await FlutterDownloader.enqueue(
       saveInPublicStorage: true,
-      fileName: 'prasoInvoice_${DateTime.now().toString().replaceAll(' ', '').replaceAll(':', '').replaceAll('-', '').replaceAll('.', '')}',
+      fileName:
+          'prasoInvoice_${DateTime.now().toString().replaceAll(' ', '').replaceAll(':', '').replaceAll('-', '').replaceAll('.', '')}',
       url: url,
       savedDir: '/storage/emulated/0/',
-      showNotification: true, // show download progress in status bar (for Android)
-      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+      showNotification: true,
+      // show download progress in status bar (for Android)
+      openFileFromNotification:
+          true, // click on notification to open downloaded file (for Android)
     );
     final tasks = await FlutterDownloader.loadTasks();
 
@@ -99,15 +102,15 @@ class _WebViewPageState extends State<WebViewPage> {
     prasoNotifyProvider = Provider.of(context, listen: false);
     WebView.platform = SurfaceAndroidWebView();
 
-    IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
       String id = data[0];
       DownloadTaskStatus status = data[1];
       int progress = data[2];
-      print('id......$id...........progress....$progress.......status.....${status.value}');
-      setState((){
-
-      });
+      print(
+          'id......$id...........progress....$progress.......status.....${status.value}');
+      setState(() {});
     });
 
     FlutterDownloader.registerCallback(downloadCallback);
@@ -119,8 +122,10 @@ class _WebViewPageState extends State<WebViewPage> {
     super.dispose();
   }
 
-  static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
-    final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
+  static void downloadCallback(
+      String id, DownloadTaskStatus status, int progress) {
+    final SendPort? send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
     send!.send([id, status, progress]);
   }
 
@@ -176,10 +181,9 @@ class _WebViewPageState extends State<WebViewPage> {
                 prasoNotifyProvider!.url = url;
               },
               navigationDelegate: (navigation) async {
-
                 print(navigation.url);
                 return Future.value(NavigationDecision.navigate);
-                },
+              },
               gestureNavigationEnabled: true,
             ),
 
@@ -194,7 +198,8 @@ class _WebViewPageState extends State<WebViewPage> {
                     height: 90,
                     color: Colors.white,
                     child: Selector<PrasoNotifyProvider, String>(
-                      selector: (context, prasoNotifyProvider) => prasoNotifyProvider.url,
+                      selector: (context, prasoNotifyProvider) =>
+                          prasoNotifyProvider.url,
                       builder: (context, value, child) => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -215,9 +220,14 @@ class _WebViewPageState extends State<WebViewPage> {
                                       prasoNotifyProvider.homeIcon,
                                   builder: (context, value, child) =>
                                       bottomNavigationBarItems(
-                                          imagePath: prasoNotifyProvider!.url.length == 'https://praso.com.br/'.length ? 'assets/images/home_select.png':'assets/images/home_icon.png',
+                                          imagePath: prasoNotifyProvider!
+                                                      .url.length ==
+                                                  'https://praso.com.br/'.length
+                                              ? 'assets/images/home_select.png'
+                                              : 'assets/images/home_icon.png',
                                           iconText: 'início',
-                                          color: prasoNotifyProvider!.homeIcon))),
+                                          color:
+                                              prasoNotifyProvider!.homeIcon))),
 
                           //category icon
                           GestureDetector(
@@ -225,13 +235,21 @@ class _WebViewPageState extends State<WebViewPage> {
                                 prasoNotifyProvider!.homeIcon = Colors.black;
                                 prasoNotifyProvider!.categoryIcon = Colors.blue;
                                 prasoNotifyProvider!.accountIcon = Colors.black;
-                                _webViewController!.loadUrl('https://praso.com.br/collections/acucares');
+                                //  _webViewController!.loadUrl('https://www.google.com/');
+                                _webViewController!.loadUrl(
+                                    'https://praso.com.br/collections/acucares');
                               },
                               child: Selector<PrasoNotifyProvider, Color>(
                                   selector: (context, prasoNotifyProvider) =>
                                       prasoNotifyProvider.categoryIcon,
                                   builder: (context, value, child) =>
-                                      bottomNavigationBarItems(imagePath: prasoNotifyProvider!.url.length == 'https://praso.com.br/collections/acucares'.length ? 'assets/images/catagories_select.png': 'assets/images/categories_icon.png',
+                                      bottomNavigationBarItems(
+                                          imagePath: prasoNotifyProvider!
+                                                      .url.length ==
+                                                  'https://praso.com.br/collections/acucares'
+                                                      .length
+                                              ? 'assets/images/catagories_select.png'
+                                              : 'assets/images/categories_icon.png',
                                           iconText: 'categorias',
                                           color: prasoNotifyProvider!
                                               .categoryIcon))),
@@ -243,14 +261,20 @@ class _WebViewPageState extends State<WebViewPage> {
                                 prasoNotifyProvider!.categoryIcon =
                                     Colors.black;
                                 prasoNotifyProvider!.accountIcon = Colors.blue;
-                                _webViewController!.loadUrl('https://praso.com.br/account/login?return_url=%2Faccount');
+                                _webViewController!.loadUrl(
+                                    'https://praso.com.br/account/login?return_url=%2Faccount');
                               },
                               child: Selector<PrasoNotifyProvider, Color>(
                                   selector: (context, prasoNotifyProvider) =>
                                       prasoNotifyProvider.accountIcon,
                                   builder: (context, value, child) =>
                                       bottomNavigationBarItems(
-                                          imagePath: prasoNotifyProvider!.url.length == 'https://praso.com.br/account/login?return_url=%2Faccount'.length ? 'assets/images/contact_select.png' :'assets/images/contact_icon.png',
+                                          imagePath: prasoNotifyProvider!
+                                                      .url.length ==
+                                                  'https://praso.com.br/account/login?return_url=%2Faccount'
+                                                      .length
+                                              ? 'assets/images/contact_select.png'
+                                              : 'assets/images/contact.png',
                                           iconText: 'conta',
                                           color: prasoNotifyProvider!
                                               .accountIcon))),
