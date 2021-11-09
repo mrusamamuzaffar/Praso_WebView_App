@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:praso/home_screen.dart';
 import 'package:praso/web_view_redirect.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +18,15 @@ ConnectionState? connectionState;
 double screenWidth = 0.0;
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(messageHandler);
+
+  await FlutterDownloader.initialize(
+      debug: true // optional: set false to disable printing logs to console
+  );
 
   runApp( MultiProvider(
     providers: [

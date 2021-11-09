@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -19,6 +22,7 @@ class WebViewPage extends StatefulWidget {
 class _WebViewPageState extends State<WebViewPage> {
   WebViewController? _webViewController;
   bool whatsAppVisibility = true;
+  ReceivePort _port = ReceivePort();
   Timer? timer;
   PrasoNotifyProvider? prasoNotifyProvider;
 
@@ -73,21 +77,55 @@ class _WebViewPageState extends State<WebViewPage> {
     );
   }
 
+  void downloadFile({required String url}) async{
+    print('.........started');
+
+    final taskId = await FlutterDownloader.enqueue(
+      saveInPublicStorage: true,
+      fileName: 'prasoInvoice_${DateTime.now().toString().replaceAll(' ', '').replaceAll(':', '').replaceAll('-', '').replaceAll('.', '')}',
+      url: url,
+      savedDir: '/storage/emulated/0/',
+      showNotification: true, // show download progress in status bar (for Android)
+      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+    );
+    final tasks = await FlutterDownloader.loadTasks();
+
+    print('competed....!$taskId......${tasks![0]}');
+  }
+
   @override
   void initState() {
+    super.initState();
     prasoNotifyProvider = Provider.of(context, listen: false);
     WebView.platform = SurfaceAndroidWebView();
-    super.initState();
+
+    IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      DownloadTaskStatus status = data[1];
+      int progress = data[2];
+      print('id......$id...........progress....$progress.......status.....${status.value}');
+      setState((){
+
+      });
+    });
+
+    FlutterDownloader.registerCallback(downloadCallback);
   }
 
   @override
   void dispose() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
+  }
+
+  static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
+    final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
+    send!.send([id, status, progress]);
   }
 
   @override
   Widget build(BuildContext context) {
-    print('build invoked');
     return SafeArea(
       child: WillPopScope(
         onWillPop: () async {
@@ -137,21 +175,11 @@ class _WebViewPageState extends State<WebViewPage> {
               onPageStarted: (url) {
                 prasoNotifyProvider!.url = url;
               },
-              /*navigationDelegate: (navigation) async {
-                    print('......naviation url......${navigation.url}');
-                    if(!(navigation.url.contains(prasoNotifyProvider!.url))) {
-                      print('downloading start.........!!');
-                      final taskId = await FlutterDownloader.enqueue(
-                        url: navigation.url,
-                        savedDir: '/storage/emulated/0/praso/',
-                        showNotification: true, // show download progress in status bar (for Android)
-                        openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-                      );
-                      print('.....task Id......$taskId');
-                    }
-                    return Future.value(NavigationDecision.navigate);
+              navigationDelegate: (navigation) async {
 
-                  },*/
+                print(navigation.url);
+                return Future.value(NavigationDecision.navigate);
+                },
               gestureNavigationEnabled: true,
             ),
 
@@ -166,8 +194,7 @@ class _WebViewPageState extends State<WebViewPage> {
                     height: 90,
                     color: Colors.white,
                     child: Selector<PrasoNotifyProvider, String>(
-                      selector: (context, prasoNotifyProvider) =>
-                          prasoNotifyProvider.url,
+                      selector: (context, prasoNotifyProvider) => prasoNotifyProvider.url,
                       builder: (context, value, child) => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -188,11 +215,9 @@ class _WebViewPageState extends State<WebViewPage> {
                                       prasoNotifyProvider.homeIcon,
                                   builder: (context, value, child) =>
                                       bottomNavigationBarItems(
-                                          imagePath:
-                                              'assets/images/home_icon.png',
+                                          imagePath: prasoNotifyProvider!.url.length == 'https://praso.com.br/'.length ? 'assets/images/home_select.png':'assets/images/home_icon.png',
                                           iconText: 'início',
-                                          color:
-                                              prasoNotifyProvider!.homeIcon))),
+                                          color: prasoNotifyProvider!.homeIcon))),
 
                           //category icon
                           GestureDetector(
@@ -206,9 +231,7 @@ class _WebViewPageState extends State<WebViewPage> {
                                   selector: (context, prasoNotifyProvider) =>
                                       prasoNotifyProvider.categoryIcon,
                                   builder: (context, value, child) =>
-                                      bottomNavigationBarItems(
-                                          imagePath:
-                                              'assets/images/categories_icon.png',
+                                      bottomNavigationBarItems(imagePath: prasoNotifyProvider!.url.length == 'https://praso.com.br/collections/acucares'.length ? 'assets/images/catagories_select.png': 'assets/images/categories_icon.png',
                                           iconText: 'categorias',
                                           color: prasoNotifyProvider!
                                               .categoryIcon))),
@@ -220,27 +243,23 @@ class _WebViewPageState extends State<WebViewPage> {
                                 prasoNotifyProvider!.categoryIcon =
                                     Colors.black;
                                 prasoNotifyProvider!.accountIcon = Colors.blue;
-                                _webViewController!.loadUrl(
-                                    'https://praso.com.br/account/login?return_url=%2Faccount');
+                                _webViewController!.loadUrl('https://praso.com.br/account/login?return_url=%2Faccount');
                               },
                               child: Selector<PrasoNotifyProvider, Color>(
                                   selector: (context, prasoNotifyProvider) =>
                                       prasoNotifyProvider.accountIcon,
                                   builder: (context, value, child) =>
                                       bottomNavigationBarItems(
-                                          imagePath:
-                                              'assets/images/contact_icon.png',
+                                          imagePath: prasoNotifyProvider!.url.length == 'https://praso.com.br/account/login?return_url=%2Faccount'.length ? 'assets/images/contact_select.png' :'assets/images/contact_icon.png',
                                           iconText: 'conta',
                                           color: prasoNotifyProvider!
                                               .accountIcon))),
-
                           GestureDetector(
                               onTap: () {
                                 openWhatsApp();
                               },
                               child: bottomNavigationBarItems(
-                                  imagePath:
-                                      'assets/images/whats_app_icon.png',
+                                  imagePath: 'assets/images/whats_app_icon.png',
                                   iconText: 'WhatsApp',
                                   color: Colors.black)),
                         ],
