@@ -71,6 +71,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Color(0xFF5F6368,)),
               ),
+
             ],
           ),
           GestureDetector(
