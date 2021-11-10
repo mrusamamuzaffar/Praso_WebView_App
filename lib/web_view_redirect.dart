@@ -78,7 +78,6 @@ class _WebViewPageState extends State<WebViewPage> {
   }
 
   void downloadFile({required String url}) async{
-    print('.........started');
 
     final taskId = await FlutterDownloader.enqueue(
       saveInPublicStorage: true,
@@ -89,8 +88,6 @@ class _WebViewPageState extends State<WebViewPage> {
       openFileFromNotification: true, // click on notification to open downloaded file (for Android)
     );
     final tasks = await FlutterDownloader.loadTasks();
-
-    print('competed....!$taskId......${tasks![0]}');
   }
 
   @override
@@ -104,7 +101,6 @@ class _WebViewPageState extends State<WebViewPage> {
       String id = data[0];
       DownloadTaskStatus status = data[1];
       int progress = data[2];
-      print('id......$id...........progress....$progress.......status.....${status.value}');
       setState((){
 
       });
@@ -177,7 +173,6 @@ class _WebViewPageState extends State<WebViewPage> {
               },
               navigationDelegate: (navigation) async {
 
-                print(navigation.url);
                 return Future.value(NavigationDecision.navigate);
                 },
               gestureNavigationEnabled: true,
