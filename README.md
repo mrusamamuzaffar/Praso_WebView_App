@@ -40,13 +40,54 @@ A full online shopping website is working perfectly in Flutter application. I us
     src="https://user-images.githubusercontent.com/101565812/206759364-52031e57-5ff3-4603-a1d3-f24c2bb52d3d.png">
 </p>
 
+## Screenshots of mobile app
+## 1
+<p align="center">
+  <img 
+    width=40%
+    height=40%
+    src="https://user-images.githubusercontent.com/101565812/206773584-46c9e65f-9326-45ce-ab35-9f9a7ca555ca.jpg">
+</p>
+
+## 2
+<p align="center">
+  <img 
+    width=40%
+    height=40%
+    src="https://user-images.githubusercontent.com/101565812/206773598-275b743b-57c7-4e66-ac75-8182a03fb1d0.jpg">
+</p>
+
+## 3
+<p align="center">
+  <img 
+    width=40%
+    height=40%
+    src="https://user-images.githubusercontent.com/101565812/206773610-09ecc131-9f6e-4a0a-ab9b-73079f4e64f6.jpg">
+</p>
+
+## 4
+<p align="center">
+  <img 
+    width=40%
+    height=40%
+    src="https://user-images.githubusercontent.com/101565812/206773617-4de6c46b-d70b-4ea6-a88e-1bd6829552d9.jpg">
+</p>
+
+## 5
+<p align="center">
+  <img 
+    width=40%
+    height=40%
+    src="https://user-images.githubusercontent.com/101565812/206773628-65e84eb8-b898-43e7-b0e4-851df1e48a93.jpg">
+</p>
+
 ## GIF
 
 <p align="center">
   <img 
     width=40%
     height=40%
-    src="https://user-images.githubusercontent.com/101565812/206677954-5e7a0788-6293-4e7e-92ec-8c874eff9916.gif">
+    src="">
 </p>
 
 
