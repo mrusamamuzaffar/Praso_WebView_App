@@ -1,9 +1,6 @@
 # praso_web_app - Flutter
 ## website https://praso.com.br/
 
-Application label: Praso
-Application Package: br.com.praso.app.praso
-
 A full online shopping website is working perfectly in Flutter application. I used the famous webview plugin for this purpose. I just did some customizations as my client required. This is a full perfect online mart based app. you can check the website by clicking on https://praso.com.br/ and also you can also see the GIF given below that show how this web looks in app side. A customer can also redirect to owner's whatsapp to ask any qestion.
 
 ✔️ Sound NullSafety <br />
